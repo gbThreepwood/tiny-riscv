@@ -24,9 +24,19 @@ I **strongly** recommend that you use a virtual python environment for the insta
 
 `python -m venv fpga-python`
 
+Activate the virtual environment:
+
+`source ./fpga-python/bin/activate`
+
+(optionally) upgrage pip:
+
 `pip install --upgrade pip`
 
+Install APIO:
+
 `pip install apio`
+
+Install the required tools (yosys, etc) using APIO:
 
 `apio install --all`
 
