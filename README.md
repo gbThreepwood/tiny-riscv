@@ -18,9 +18,11 @@ TODO: Find a nice board with a more capable FPGA and add support for it.
 
 ## Installation of the required tools
 
-The project uses APIO (https://apiodoc.readthedocs.io/en/stable/index.html) in order to simplify installation of the required tools for building and testing.
+I **strongly** recommend that you use a GNU/Linux system, although I am sure it is possible to get this working in Windows or MacOS.
 
-I **strongly** recommend that you use a virtual python environment for the installation of the PIP package (this is a general recommendation any time you install something using PIP).
+The project uses APIO (https://apiodoc.readthedocs.io/en/stable/index.html) in order to simplify installation of the required tools for building and testing. Manual installation of each required tool is also possible, but unless packages are available in your favorite Linux distro the installation can be a pain to complete.
+
+I also **strongly** recommend that you use a virtual python environment for the installation of the PIP package (this is a general recommendation any time you install something using PIP).
 
 `python -m venv fpga-python`
 
@@ -28,7 +30,7 @@ Activate the virtual environment:
 
 `source ./fpga-python/bin/activate`
 
-(optionally) upgrage pip:
+(optionally) upgrade pip:
 
 `pip install --upgrade pip`
 
@@ -36,12 +38,11 @@ Install APIO:
 
 `pip install apio`
 
-Install the required tools (yosys, etc) using APIO:
+Install the required tools (yosys, nextpnr, etc) using APIO:
 
 `apio install --all`
 
 ## Building the Hardware
-
 
 `apio build`
 
