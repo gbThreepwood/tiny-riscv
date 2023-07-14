@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# Except these files
+!.gitignore
+!*.v
+!Makefile
+!*.gtkw
+!*.pcf
+!*.md
+
+# Even if they are in subdirectories
+!*/

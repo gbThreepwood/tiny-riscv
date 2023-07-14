@@ -1,60 +1,52 @@
 `default_nettype none
-`include "clock_tools.v"
+//`include "hw_specific/clock_tools.v"
 
 module tiny_riscv_top(
     input  i_Clk,
     input  i_UART_RX,
     output o_UART_TX, 
 
-    input i_Switch_1,
-    input i_Switch_2,
-    input i_Switch_3,
-    input i_Switch_4,
+    input wire [3:0] i_Switch,
+    output wire [3:0] o_LED,
 
-    output o_LED_1,
-    output o_LED_2,
-    output o_LED_3,
-    output o_LED_4,
-
-    // Segment 1
-    output o_Segment1_A,
-    output o_Segment1_B,
-    output o_Segment1_C,
-    output o_Segment1_D,
-    output o_Segment1_E,
-    output o_Segment1_F,
-    output o_Segment1_G,
-
-    // Segment 2
-    output o_Segment2_A,
-    output o_Segment2_B,
-    output o_Segment2_C,
-    output o_Segment2_D,
-    output o_Segment2_E,
-    output o_Segment2_F,
-    output o_Segment2_G,
-    
-    // VGA
+    output wire [6:0] o_Segment1,
+    output wire [6:0] o_Segment2,
+   
     output o_VGA_HSync,
     output o_VGA_VSync,
-    output o_VGA_Red_0,
-    output o_VGA_Red_1,
-    output o_VGA_Red_2,
-    output o_VGA_Grn_0,
-    output o_VGA_Grn_1,
-    output o_VGA_Grn_2,
-    output o_VGA_Blu_0,
-    output o_VGA_Blu_1,
-    output o_VGA_Blu_2 
+    output wire [2:0] o_VGA_Red,
+    output wire [2:0] o_VGA_Grn,
+    output wire [2:0] o_VGA_Blu,
 
+    inout wire [7:0] io_PMOD
 );
+
+    assign o_Segment1[6] = i_Switch[1];
 
     wire w_internal_Clock;
 
+    wire [31:0] w_mem_addr;
+    wire [31:0] w_mem_data;
+    wire w_mem_read_strobe;
+
+    tiny_riscv_memory memory_inst (
+        .i_Clk(w_internal_Clock),
+        .i_mem_addr(w_mem_addr),
+        .i_read_strobe(w_mem_read_strobe),
+        .o_mem_data(w_mem_data)
+    );
+
+
+    wire [31:0] w_Reg;
+    assign o_LED = w_Reg[3:0];
 
     tiny_riscv_processor processor_inst (
         .i_Clk(w_internal_Clock),
-        .i_Rst_N(1'b1)
+        .i_Rst_N(!i_Switch[0]),
+        .o_Reg(w_Reg),
+        .o_mem_addr(w_mem_addr),
+        .i_mem_data(w_mem_data),
+        .o_read_strobe(w_mem_read_strobe)
     );
 
 
@@ -62,6 +54,9 @@ module tiny_riscv_top(
 
     //reg [31:0] r_instr = 0;
 
+    //always @(posedge w_internal_Clock) begin
+    //    o_LED[2] = ~o_LED[2];
+    //end
 
     //always @(posedge w_internal_Clock) begin
     //    o_LEDs <= memory[r_PC];
@@ -75,8 +70,11 @@ module tiny_riscv_top(
     //end
 
 
+    `ifdef TESTBENCH
+    assign w_internal_Clock = i_Clk;
+    `else
     clock_controller #(
-        .c_SLOW_CLOCK_BITS(21)
+        //.c_SLOW_CLOCK_BITS(21)
     )
     clock_controller_inst
     (
@@ -85,5 +83,6 @@ module tiny_riscv_top(
         .o_Clk(w_internal_Clock),
         .o_RstN()
     );
+    `endif
 
 endmodule

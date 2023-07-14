@@ -6,6 +6,8 @@ Verilog implementation of a basic RISC-V CPU.
 
 The CPU in this repository is mainly intended to serve as a learning tool for people interested in the internal operations of a CPU, or for people who would like to design their own CPU.
 
+The ISA manual is available here: https://riscv.org/wp-content/uploads/2019/06/riscv-spec.pdf
+
 ## Features
 
 
@@ -20,7 +22,27 @@ TODO: Find a nice board with a more capable FPGA and add support for it.
 
 I **strongly** recommend that you use a GNU/Linux system, although I am sure it is possible to get this working in Windows or MacOS.
 
-The project uses APIO (https://apiodoc.readthedocs.io/en/stable/index.html) in order to simplify installation of the required tools for building and testing. Manual installation of each required tool is also possible, but unless packages are available in your favorite Linux distro the installation can be a pain to complete.
+Initially my intention was to use APIO as the build system (PlatformIO for FPGAs) but unfortunately at the moment it is not terribly flexible and quickly got annoying to work with for larger projects. Instead I have installed some software tools using my package manager, and manually downloaded others.
+
+You will need to (at least) install the following tools:
+
+* Yosys (https://github.com/YosysHQ/yosys)
+* nextpnr (https://github.com/YosysHQ/nextpnr)
+* icestorm (https://github.com/YosysHQ/icestorm)
+
+For simulation you should also install:
+
+* gtkwave (https://gtkwave.sourceforge.net/)
+* iverilog (https://github.com/steveicarus/iverilog)
+* verilator (https://www.veripool.org/verilator/)
+
+The simplest way to get the required software tools is to download pre-built binaries from here: https://github.com/YosysHQ/oss-cad-suite-build/releases
+
+
+
+### APIO
+
+~~The project uses APIO (https://apiodoc.readthedocs.io/en/stable/index.html) in order to simplify installation of the required tools for building and testing. Manual installation of each required tool is also possible, but unless packages are available in your favorite Linux distro the installation can be a pain to complete.~~
 
 I also **strongly** recommend that you use a virtual python environment for the installation of the PIP package (this is a general recommendation any time you install something using PIP).
 
@@ -47,12 +69,6 @@ Install the required tools (yosys, nextpnr, etc) using APIO:
 `apio build`
 
 `apio upload`
-
-Under the hood it (among others) rely on the following tools:
-
-* Yosys (https://github.com/YosysHQ/yosys)
-* nextpnr (https://github.com/YosysHQ/nextpnr)
-* icestorm (https://github.com/YosysHQ/icestorm)
 
 ## Software to run on the CPU
  One of the nice things about implementing a standardized instruction set (such as RISC-V CPU), as opposed to inventing your own instruction set is that assemblers and compilers already exists for several programming languages.
