@@ -29,9 +29,9 @@ module tiny_riscv_processor(
     wire [31:0] w_return_data;
     wire w_return_en;
 
-    reg [31:0] r_memory [0:255];
+    //reg [31:0] r_memory [0:255];
 
-//`ifdef TESTBENCH
+`ifdef TESTBENCH
     integer i;
     initial begin
         //r_RegisterBank <= '{default: '0};
@@ -39,7 +39,7 @@ module tiny_riscv_processor(
             r_RegisterBank[i] <= 0;
         end
     end
-//`endif
+`endif
 
 
     // Checks for all the different possible instruction types
