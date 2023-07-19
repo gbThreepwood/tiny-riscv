@@ -23,30 +23,36 @@ module tiny_riscv_top(
 
     assign o_Segment1[6] = i_Switch[1];
 
-    wire w_internal_Clock;
+    //wire w_internal_Clock;
 
     wire [31:0] w_mem_addr;
     wire [31:0] w_mem_data;
     wire w_mem_read_strobe;
 
+    wire [31:0] w_mem_write_data;
+    wire [3:0] w_mem_write_mask;
+
     tiny_riscv_memory memory_inst (
-        .i_Clk(w_internal_Clock),
+        .i_Clk(i_Clk),
         .i_mem_addr(w_mem_addr),
         .i_read_strobe(w_mem_read_strobe),
-        .o_mem_data(w_mem_data)
+        .o_mem_data(w_mem_data),
+        .i_mem_write_data(w_mem_write_data),
+        .i_mem_write_mask(w_mem_write_mask)
     );
-
 
     wire [31:0] w_Reg;
     assign o_LED = w_Reg[3:0];
 
     tiny_riscv_processor processor_inst (
-        .i_Clk(w_internal_Clock),
+        .i_Clk(i_Clk),
         .i_Rst_N(!i_Switch[0]),
         .o_Reg(w_Reg),
         .o_mem_addr(w_mem_addr),
         .i_mem_data(w_mem_data),
-        .o_read_strobe(w_mem_read_strobe)
+        .o_read_strobe(w_mem_read_strobe),
+        .o_mem_write_data(w_mem_write_data),
+        .o_mem_write_mask(w_mem_write_mask)
     );
 
 
@@ -70,19 +76,19 @@ module tiny_riscv_top(
     //end
 
 
-    `ifdef TESTBENCH
-    assign w_internal_Clock = i_Clk;
-    `else
-    clock_controller #(
-        //.c_SLOW_CLOCK_BITS(21)
-    )
-    clock_controller_inst
-    (
-        .i_Clk(i_Clk),
-        .i_Rst(1'b0),
-        .o_Clk(w_internal_Clock),
-        .o_RstN()
-    );
-    `endif
+    //`ifdef TESTBENCH
+    //assign w_internal_Clock = i_Clk;
+    //`else
+    //clock_controller #(
+    //    //.c_SLOW_CLOCK_BITS(21)
+    //)
+    //clock_controller_inst
+    //(
+    //    .i_Clk(i_Clk),
+    //    .i_Rst(1'b0),
+    //    .o_Clk(w_internal_Clock),
+    //    .o_RstN()
+    //);
+    //`endif
 
 endmodule
