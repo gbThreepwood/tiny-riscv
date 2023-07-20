@@ -9,7 +9,7 @@ module tiny_riscv_tb();
     wire [3:0] w_LEDs;
     reg [3:0] w_LEDs_prev;
 
-    reg [3:0] r_Switch = 4'b0001;
+    reg [3:0] r_Switch = 4'b0000;
 
     tiny_riscv_top tiny_riscv_top_inst (
         .i_Clk(r_Clk),
@@ -17,18 +17,13 @@ module tiny_riscv_tb();
         .i_Switch(r_Switch)
     );
     
-    //tiny_riscv_processor processor_inst (
-    //    .i_Clk(r_Clk),
-    //    .i_Rst_N(r_ResetN)
-    //);
-
     initial begin
 
         r_Clk = 1'b0;
 
         r_ResetN <= 1'b0;
         #10 r_ResetN <= 1'b1;
-        #800 $display("Explicitly calling finish from testbench.");
+        #1500 $display("Explicitly calling finish from testbench.");
         #1 $finish;
     end
 
