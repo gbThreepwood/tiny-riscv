@@ -22,17 +22,7 @@ module tiny_riscv_memory(
     //    $readmemh("../../firmware/firmware.mem",r_memory);
     //end
 
-    `include "rtl/tools/riscv_assembly.v"
-
-    integer L0_   = 12;
-    integer L1_   = 20;
-    integer L2_   = 52;
-    integer L3_   = 104;
-    integer wait_ = 152;
-    integer wait_L0_ = 160;
-    integer putc_ = 172;
-    integer putc_L0_ = 180;
-   
+  
     initial begin
        // The memory addresses refer to single bytes, but
        // 4 bytes are read at the same time.
