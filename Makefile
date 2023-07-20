@@ -5,6 +5,8 @@ SIM = iverilog
 SIM_RUNTIME = vvp
 SYNTH = yosys
 PNR = nextpnr-ice40
+CPU_FREQ = 25
+PNR_ARGS = --force --timing-allow-fail --pcf-allow-unconstrained --opt-timing --freq $(CPU_FREQ)
 PACK = icepack
 PROG = iceprog
 TIME = icetime
@@ -25,7 +27,8 @@ VERILOG_TESTBENCH_SOURCES = simulation/tiny_riscv_tb.v
 
 VERILOG_SOURCES := $(wildcard $(SOURCEDIR)/*.v)
 VERILOG_SOURCES += $(wildcard $(SOURCEDIR)/cpu/*.v)
-VERILOG_SOURCES += $(wildcard $(SOURCEDIR)/hw_specific/*.v)
+VERILOG_SOURCES += $(wildcard $(SOURCEDIR)/modules/*.v)
+#VERILOG_SOURCES += $(wildcard $(SOURCEDIR)/hw_specific/*.v)
 $(info $$VERILOG_SOURCES is [${VERILOG_SOURCES}])
 
 all: $(OUTDIR)/$(PROJECT_NAME).bin $(OUTDIR)/$(PROJECT_NAME).rpt
@@ -39,7 +42,7 @@ synth: $(OUTDIR)/$(PROJECT_NAME).json
 
 # Synth
 $(OUTDIR)/$(PROJECT_NAME).json: $(VERILOG_SOURCES)
-	$(SYNTH) -p 'synth_ice40 -json $@ -top $(PROJECT_NAME)_top' $^
+	$(SYNTH) -p 'synth_ice40 -relut -json $@ -top $(PROJECT_NAME)_top' $^
 
 # Build simulation
 $(OUTDIR)/$(PROJECT_NAME)_tb: $(VERILOG_SOURCES) $(VERILOG_TESTBENCH_SOURCES)
@@ -55,7 +58,7 @@ $(OUTDIR)/$(PROJECT_NAME).rpt: $(OUTDIR)/$(PROJECT_NAME).asc
 
 # Place and route
 $(OUTDIR)/$(PROJECT_NAME).asc: $(OUTDIR)/$(PROJECT_NAME).json
-	$(PNR) --$(DEVICE) --package $(PACKAGE) --pcf $(PIN_DEF) --json $< --asc $@
+	$(PNR) $(PNR_ARGS) --$(DEVICE) --package $(PACKAGE) --pcf $(PIN_DEF) --json $< --asc $@
 
 # Pack
 $(OUTDIR)/$(PROJECT_NAME).bin: $(OUTDIR)/$(PROJECT_NAME).asc
