@@ -37,9 +37,9 @@ reg [7:0] r_TX_Byte;            // TX data register
 reg [$clog2(CLKS_PER_BIT):0] r_Clock_Count;
 
 initial begin
-    o_TX_Serial <= 1'b0;
-    o_TX_Done <= 1'b1;
-    o_TX_InProgress <= 1'b0;
+    o_TX_Serial = 1'b0;
+    o_TX_Done = 1'b1;
+    o_TX_InProgress = 1'b0;
 end
 
 always @(posedge i_Clk or negedge i_Rst_L) begin
@@ -76,7 +76,7 @@ always @(posedge i_Clk or negedge i_Rst_L) begin
                 o_TX_Serial <= 1'b0; // Set line low to begin a start bit
 
                 if(r_Clock_Count == (CLKS_PER_BIT - 1)) begin // Wait for one bit duration
-                    r_Clock_Count <= 1'b0;
+                    r_Clock_Count <= 0;
                     r_TX_State <= TX_DATA_BITS;
                 end
                 else begin
@@ -90,7 +90,7 @@ always @(posedge i_Clk or negedge i_Rst_L) begin
                 o_TX_Serial <= r_TX_Byte[r_Bit_Index];
 
                 if(r_Clock_Count == (CLKS_PER_BIT - 1)) begin // Wait for one bit duration
-                    r_Clock_Count <= 1'b0;
+                    r_Clock_Count <= 0;
                     
                     if (r_Bit_Index < 7) begin
                         r_Bit_Index <= r_Bit_Index + 1;
@@ -111,7 +111,7 @@ always @(posedge i_Clk or negedge i_Rst_L) begin
                 o_TX_Serial <= 1'b1; // Set the serial line high to indicate a stop bit
 
                 if(r_Clock_Count == (CLKS_PER_BIT - 1)) begin // Wait for one bit duration
-                    r_Clock_Count <= 1'b0;
+                    r_Clock_Count <= 0;
                     r_TX_State <= FINISH;
                 end
                 else begin

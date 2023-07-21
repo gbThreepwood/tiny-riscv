@@ -68,8 +68,14 @@ $(OUTDIR)/$(PROJECT_NAME).bin: $(OUTDIR)/$(PROJECT_NAME).asc
 prog: $(OUTDIR)/$(PROJECT_NAME).bin
 	$(PROG) $<
 
+verilator:
+	verilator -DTESTBENCH -DBOARD_FREQ=12 -Wno-fatal --top-module tiny_riscv_top -cc -exe verilator/main.cpp $(VERILOG_SOURCES)
+	cd obj_dir; make -f Vtiny_riscv_top.mk
+	
+#rtl/tiny_riscv_top.v rtl/cpu/tiny_riscv_processor.v rtl/cpu/tiny_riscv_memory.v rtl/modules/uart.v
+
 # Clean all the build artifacts
 clean:
 	rm $(PROJECT_NAME).json $(PROJECT_NAME).asc $(PROJECT_NAME).bin
 
-.PHONY: all sim synth wave prog clean
+.PHONY: all sim synth wave prog clean verilator

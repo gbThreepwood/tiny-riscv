@@ -10,7 +10,9 @@ The ISA manual is available here: https://riscv.org/wp-content/uploads/2019/06/r
 
 ## Features
 
-
+* Support the RV32I Base Instruction Set
+* VGA output
+* Small size
 
 ## Hardware
 
@@ -71,13 +73,38 @@ Install the required tools (yosys, nextpnr, etc) using APIO:
 `apio upload`
 
 ## Software to run on the CPU
- One of the nice things about implementing a standardized instruction set (such as RISC-V CPU), as opposed to inventing your own instruction set is that assemblers and compilers already exists for several programming languages.
+ One of the nice things about implementing a standardized instruction set (such as RISC-V), as opposed to inventing your own instruction set is that assemblers and compilers already exists for several programming languages.
 
 ### Assembly programming
+
+To explain assembly programming a ledblink program is used as example.
+
+To assemble the program you should invoke:
+
+`riscv64-elf-as -march=rv32i -mabi=ilp32 -mno-relax ledblink.S -o ledblink.o`
+
+The linker ensures correct placement in memory by means of a simle linker script ledblink.elf
+
+`riscv64-elf-ld ledblink.o -o ledblink.elf -T blockram.ld -m elf32lriscv -nostdlib`
+
+The elf-objcopy utility support output in "verilog" format, i.e. a listing of hexadecimal values encoded as ASCII.
+
+`riscv64-elf-objcopy -O verilog --verilog-data-width=4 ledblink.elf ledblink.mem`
+
+For "fun" you can also disassemble the ELF using:
+
+`riscv64-elf-objdump -d ledblink.elf`
+
+Intel HEX format:
+
+`riscv64-elf-objcopy -O ihex ledblink.elf ledblink.hex`
 
 ### C/C++
 
 ### Rust
 
 
+## UART
+
+`picocom -b 115200 /dev/ttyUSB1 --imap lfcrlf,crcrlf --omap delbs,crlf --send-cmd "ascii-xfr -s -l 30 -n"`
 

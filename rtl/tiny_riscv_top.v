@@ -68,11 +68,21 @@ module tiny_riscv_top(
     localparam s_PERIPH_LED_BIT = 0;
     localparam s_PERIPH_UART_DATA_BIT = 1;
     localparam s_PERIPH_UART_CTRL_BIT = 2;
+    localparam s_PERIPH_7SEG1_DATA_BIT = 3;
+    localparam s_PERIPH_7SEG2_DATA_BIT = 4;
 
     always @(posedge i_Clk) begin
         
         if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_LED_BIT]) begin
-            o_LED <= w_mem_write_data;
+            o_LED <= w_mem_write_data[3:0];
+        end
+
+        if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_7SEG1_DATA_BIT]) begin
+            o_Segment1 <= w_mem_write_data[6:0];
+        end
+
+        if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_7SEG2_DATA_BIT]) begin
+            o_Segment2 <= w_mem_write_data[6:0];
         end
     end
 

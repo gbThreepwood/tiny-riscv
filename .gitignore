@@ -9,6 +9,9 @@
 !*.pcf
 !*.md
 !*.py
+!*.S
+!*.c
+!*.ld
 
 # Even if they are in subdirectories
 !*/

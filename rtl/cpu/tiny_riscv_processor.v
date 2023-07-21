@@ -19,7 +19,7 @@
 module tiny_riscv_processor(
     input wire i_Clk,
     input wire i_Rst_N,
-    output reg [31:0] o_Reg,
+    //output reg [31:0] o_Reg,
     output wire [31:0] o_mem_addr,
     input wire [31:0] i_mem_data,
     output wire o_read_strobe,
@@ -43,7 +43,7 @@ module tiny_riscv_processor(
     initial begin
         //r_RegisterBank <= '{default: '0};
         for(i = 0; i < 32; i = i + 1) begin
-            r_RegisterBank[i] <= 0;
+            r_RegisterBank[i] = 0;
         end
     end
 `endif
@@ -129,8 +129,8 @@ module tiny_riscv_processor(
             3'b000: w_load_data = {{25{w_load_byte[7]}}, w_load_byte[6:0]};             // Load byte with sign extension
             3'b001: w_load_data = {{17{w_load_halfword[15]}}, w_load_halfword[14:0]};   // Load halfword with sign extension
             3'b010: w_load_data = i_mem_data;                                           // Load word
-            3'b100: w_load_data = w_load_byte;                                          // Load byte without sign extension 
-            3'b101: w_load_data = w_load_halfword;                                      // Load halfword without sign extension
+            3'b100: w_load_data = {{24{1'b0}},w_load_byte};                             // Load byte without sign extension 
+            3'b101: w_load_data = {{16{1'b0}},w_load_halfword};                         // Load halfword without sign extension
             default: w_load_data = 0;
         endcase
     end
@@ -234,13 +234,13 @@ module tiny_riscv_processor(
             if(w_return_en && (w_rd_param != 0)) begin
                 r_RegisterBank[w_rd_param] <= w_return_data;
 
-                `ifdef TESTBENCH
+                `ifdef VERBOSE_TESTBENCH
                 $display("x%0d <= %b", w_rd_param, w_return_data);
                 `endif
 
-                if(w_rd_param == 10) begin
-                    o_Reg <= w_return_data;
-                end
+                //if(w_rd_param == 10) begin
+                //    o_Reg <= w_return_data;
+                //end
             end
 
             case(r_state)
@@ -347,8 +347,10 @@ module tiny_riscv_processor(
     wire [31:0] w_shifter_input = (w_funct3 == 3'b001) ? flipped(w_ALU_in_1) : w_ALU_in_1; // The input to the bit shifter should be the flipped version of the acutal input if we want to perform left shift
     
     // Bit 30 of the instruction determines if the shift is arithmetic or logical and bit 31 of the input is the sign bit
-    // If both of them are high we perform arithmetic right shift 
-    wire [31:0] w_bit_shifter = $signed({r_instr[30] & w_ALU_in_1[31], w_shifter_input}) >>> w_shift_amount; //w_ALU_in_2[4:0];
+    // If both of them are high we perform arithmetic right shift
+    // To avoid warnings from sim/synth tools we explicitly truncate away one bit
+    wire [32:0] w_bit_shifter_temp = $signed({r_instr[30] & w_ALU_in_1[31], w_shifter_input}) >>> w_shift_amount; //w_ALU_in_2[4:0];
+    wire [31:0] w_bit_shifter = w_bit_shifter_temp[31:0];
 
     // Flip the result if the operation was a left shift (the input was flipped before using the right shifter, and now we flip it back)
     wire [31:0] w_left_shift = flipped(w_bit_shifter);
@@ -458,7 +460,7 @@ module tiny_riscv_processor(
     // Testbench output
     ////////////////////////////////////////////////////////////
 
-    `ifdef TESTBENCH
+    `ifdef VERBOSE_TESTBENCH
         always @(posedge i_Clk) begin
 
             if(r_state == STATE_EXECUTE) begin
