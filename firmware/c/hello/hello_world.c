@@ -12,7 +12,7 @@ int main(void) {
     for(uint8_t i = 0; i < 10; i++){
         putstring("Talet er:");
 
-        c[0] = i + 48;
+        c[0] = i+i + 48;
         putstring(c);
 
         putstring("\r\n");

@@ -18,6 +18,7 @@ putstring:
     addi t2,t2,1
     j .L2
 .L3:
+    ebreak
     lw ra,0(sp) # restore return adress to ra from the stack
     addi sp,sp,4
     ret
