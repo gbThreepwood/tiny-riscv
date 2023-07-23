@@ -97,18 +97,35 @@ module tiny_riscv_top(
 
     wire [7:0] w_uart_data = !i_Switch[2] ? w_mem_write_data[7:0] : r_test_data;
 
-    uart_tx #(
-        .CLKS_PER_BIT(217)
-    ) uart_tx_inst (
-        .i_Rst_L(w_reset_N),
-        .i_Clk(i_Clk),
-        //.i_TX_Byte(w_mem_write_data[7:0]),
-        .i_TX_Byte(w_uart_data),
-        .i_TX_Start(w_UART_start_tx),      // Initiate TX of the data in the TX register
-        .o_TX_InProgress(),
-        .o_TX_Done(w_UART_ready),
-        .o_TX_Serial(o_UART_TX)
+    //uart_tx #(
+    //    .CLKS_PER_BIT(217)
+    //) uart_tx_inst (
+    //    .i_Rst_L(w_reset_N),
+    //    .i_Clk(i_Clk),
+    //    //.i_TX_Byte(w_mem_write_data[7:0]),
+    //    .i_TX_Byte(w_uart_data),
+    //    .i_TX_Start(w_UART_start_tx),      // Initiate TX of the data in the TX register
+    //    .o_TX_InProgress(),
+    //    .o_TX_Done(w_UART_ready),
+    //    .o_TX_Serial(o_UART_TX)
+    //);
+
+
+    corescore_emitter_uart #(
+       .clk_freq_hz(25*1000000),
+       .baud_rate(115200)
+       //.baud_rate(1000000)
+    ) UART_inst (
+       .i_clk(i_Clk),
+       .i_rst(w_reset_N),
+       .i_data(w_uart_data),
+       .i_valid(w_UART_start_tx),
+       .o_ready(w_UART_ready),
+       .o_uart_tx(o_UART_TX)
     );
+
+
+
 
     wire [31:0] w_periph_read_data = w_mem_word_addr[s_PERIPH_UART_CTRL_BIT] ? {22'b0, !w_UART_ready, 9'b0} : 32'b0;
 

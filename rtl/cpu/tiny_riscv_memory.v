@@ -29,10 +29,10 @@ module tiny_riscv_memory(
 
     end
 
-    `ifdef TESTBENCH
+    `ifdef VERBOSE_TESTBENCH
     integer idx;
     initial begin
-        #20 $display("Memory:");
+        $display("Memory:");
         for (idx = 1; idx < 300; idx = idx + 1) begin
 
             $write("0x%04h ", r_memory[idx-1]);
