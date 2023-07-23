@@ -103,3 +103,7 @@ set_io io_PMOD[5] 79
 set_io io_PMOD[6] 80
 set_io io_PMOD[7] 81
 
+#set_io io_M25P10A_MOSI 45
+#set_io io_M25P10A_MISO 46
+#set_io io_M25P10A_SCK 48
+#set_io io_M25P10A_SS 49

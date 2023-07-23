@@ -2,7 +2,7 @@
 
 Verilog implementation of a basic RISC-V CPU.
 
-> :warning: **Warning: This project is a work in progress**
+> :warning: **Warning: The CPU in this project works, but it is made for fun, and probably not the best choice if you need a reliable soft core for you next FPGA project**
 
 The CPU in this repository is mainly intended to serve as a learning tool for people interested in the internal operations of a CPU, or for people who would like to design their own CPU.
 
@@ -11,8 +11,13 @@ The ISA manual is available here: https://riscv.org/wp-content/uploads/2019/06/r
 ## Features
 
 * Support the RV32I Base Instruction Set
+* UART RX and TX
+* GPIO
 * VGA output
 * Small size
+
+* TODO: Support RV32M on FPGAs which have room for it
+* TODO: Support pipelining on FPGAs which have room for it
 
 ## Hardware
 
@@ -75,9 +80,11 @@ Install the required tools (yosys, nextpnr, etc) using APIO:
 ## Software to run on the CPU
  One of the nice things about implementing a standardized instruction set (such as RISC-V), as opposed to inventing your own instruction set is that assemblers and compilers already exists for several programming languages.
 
+The software examples uses CMake as build system, but a few simple examples uses Make. The reason for this decision is to have some simple examples which are self contained in their own directory, with all dependencies. This should hopefully make it simpler to grasp all the low level details of how the software interacts with the CPU.
+
 ### Assembly programming
 
-To explain assembly programming a ledblink program is used as example.
+To explain the process of generating the machine code from an assembly program, the ledblink program is used as example.
 
 To assemble the program you should invoke:
 
@@ -100,6 +107,8 @@ Intel HEX format:
 `riscv64-elf-objcopy -O ihex ledblink.elf ledblink.hex`
 
 ### C/C++
+
+
 
 ### Rust
 

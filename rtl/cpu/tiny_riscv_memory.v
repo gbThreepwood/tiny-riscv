@@ -20,17 +20,32 @@ module tiny_riscv_memory(
     //
     // If we use 12 blocks:
     // 12*4k/8 = 6kB.
-    // 
+    //
     reg [31:0] r_memory[0:1535];
-    //integer idx;
     initial begin
         //$readmemh("firmware/assembly/ledblink.mem",r_memory);
-        $readmemh("firmware/assembly/hello/hello_world.mem",r_memory);
+        //$readmemh("firmware/assembly/hello/hello_world.mem",r_memory);
+        $readmemh("firmware/c/hello/build/hello_world.mem",r_memory);
 
-        //for (idx = 0; idx < 10; idx = idx + 1) $dumpvars(1, r_memory[idx]);
     end
 
-    
+    `ifdef TESTBENCH
+    integer idx;
+    initial begin
+        #20 $display("Memory:");
+        for (idx = 1; idx < 300; idx = idx + 1) begin
+
+            $write("0x%04h ", r_memory[idx-1]);
+            if(idx%4 == 0) begin
+                $write("\n");
+            end
+            //$dumpvars(1, r_memory[idx]);
+
+        end
+        $write("\n");
+    end
+    `endif
+
 
 
     //initial begin
@@ -38,12 +53,8 @@ module tiny_riscv_memory(
     //   // 4 bytes are read at the same time.
     //   //                403     402    401    400
     //   r_memory[100] = {8'h04, 8'h03, 8'h02, 8'h01};
-    //   //                407    406    405    404 
+    //   //                407    406    405    404
     //   r_memory[101] = {8'h08, 8'h07, 8'h06, 8'h05};
-
-    //   r_memory[102] = {8'h0C, 8'h0B, 8'h0A, 8'h09};
-    //   r_memory[103] = {8'h00, 8'h0F, 8'h0E, 8'h0D};
-
     //end
 
     // We read 4 bytes (one word) at each read strobe, thus the two LSBs are ignored.
@@ -53,13 +64,19 @@ module tiny_riscv_memory(
         if(i_read_strobe) begin
             // We have to change the endianess since the data is stored as little endian (in accordance with the RISC-V standard)
             // TODO: investigate if there are more elegant ways of implementing this (perhaps in the CPU module)
-            o_mem_data <= changeEndian(r_memory[w_word_address[10:0]]);         
+            // http://cwcserv.ucsd.edu/~billlin/classes/ECE111/endian.htm
+            o_mem_data <= changeEndian(r_memory[w_word_address[10:0]]);
         end
 
-        if(i_mem_write_mask[0]) r_memory[w_word_address[10:0]][7:0]    <= i_mem_write_data[7:0];
-        if(i_mem_write_mask[1]) r_memory[w_word_address[10:0]][15:8]   <= i_mem_write_data[15:8];
-        if(i_mem_write_mask[2]) r_memory[w_word_address[10:0]][23:16]  <= i_mem_write_data[23:16];
-        if(i_mem_write_mask[3]) r_memory[w_word_address[10:0]][31:24]  <= i_mem_write_data[31:24];
+        //if(i_mem_write_mask[0]) r_memory[w_word_address[10:0]][7:0]    <= i_mem_write_data[7:0];
+        //if(i_mem_write_mask[1]) r_memory[w_word_address[10:0]][15:8]   <= i_mem_write_data[15:8];
+        //if(i_mem_write_mask[2]) r_memory[w_word_address[10:0]][23:16]  <= i_mem_write_data[23:16];
+        //if(i_mem_write_mask[3]) r_memory[w_word_address[10:0]][31:24]  <= i_mem_write_data[31:24];
+
+        if(i_mem_write_mask[0]) r_memory[w_word_address[10:0]][31:24]    <= i_mem_write_data[7:0];
+        if(i_mem_write_mask[1]) r_memory[w_word_address[10:0]][23:16]   <= i_mem_write_data[15:8];
+        if(i_mem_write_mask[2]) r_memory[w_word_address[10:0]][15:8]  <= i_mem_write_data[23:16];
+        if(i_mem_write_mask[3]) r_memory[w_word_address[10:0]][7:0]  <= i_mem_write_data[31:24];
     end
 
 endmodule

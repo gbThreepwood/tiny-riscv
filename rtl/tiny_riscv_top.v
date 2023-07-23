@@ -4,14 +4,14 @@
 module tiny_riscv_top(
     input  i_Clk,
     input  i_UART_RX,
-    output o_UART_TX, 
+    output o_UART_TX,
 
     input wire [3:0] i_Switch,
     output reg [3:0] o_LED,
 
     output wire [6:0] o_Segment1,
     output wire [6:0] o_Segment2,
-   
+
     output o_VGA_HSync,
     output o_VGA_VSync,
     output wire [2:0] o_VGA_Red,
@@ -22,6 +22,10 @@ module tiny_riscv_top(
 );
 
     wire w_reset_N = !i_Switch[0];
+
+    initial begin
+        o_LED = 4'b0000;
+    end
 
     assign o_Segment1[6] = i_Switch[1];
 
@@ -72,30 +76,35 @@ module tiny_riscv_top(
     localparam s_PERIPH_7SEG2_DATA_BIT = 4;
 
     always @(posedge i_Clk) begin
-        
+
         if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_LED_BIT]) begin
             o_LED <= w_mem_write_data[3:0];
         end
 
-        if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_7SEG1_DATA_BIT]) begin
-            o_Segment1 <= w_mem_write_data[6:0];
-        end
+        //if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_7SEG1_DATA_BIT]) begin
+        //    o_Segment1 <= w_mem_write_data[6:0];
+        //end
 
-        if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_7SEG2_DATA_BIT]) begin
-            o_Segment2 <= w_mem_write_data[6:0];
-        end
+        //if(w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_7SEG2_DATA_BIT]) begin
+        //    o_Segment2 <= w_mem_write_data[6:0];
+        //end
     end
 
     wire w_UART_start_tx = w_is_periph_req & w_memory_write_strobe & w_mem_word_addr[s_PERIPH_UART_DATA_BIT];
     wire w_UART_ready;
+
+    reg [7:0] r_test_data = "Y";
+
+    wire [7:0] w_uart_data = !i_Switch[2] ? w_mem_write_data[7:0] : r_test_data;
 
     uart_tx #(
         .CLKS_PER_BIT(217)
     ) uart_tx_inst (
         .i_Rst_L(w_reset_N),
         .i_Clk(i_Clk),
-        .i_TX_Byte(w_mem_write_data[7:0]),
-        .i_TX_Start(w_UART_start_tx),      // Initiate TX of the data in the TX register 
+        //.i_TX_Byte(w_mem_write_data[7:0]),
+        .i_TX_Byte(w_uart_data),
+        .i_TX_Start(w_UART_start_tx),      // Initiate TX of the data in the TX register
         .o_TX_InProgress(),
         .o_TX_Done(w_UART_ready),
         .o_TX_Serial(o_UART_TX)
@@ -141,13 +150,13 @@ module tiny_riscv_top(
     //`endif
 
     `ifdef TESTBENCH
-   
+
     always @(posedge i_Clk) begin
         if(w_UART_start_tx) begin
-            $display("UART output:");
+            //$display("UART output:");
             $write("%c", w_mem_write_data[7:0]);
             $fflush(32'h8000_0001);
-            $display("\r\n");
+            //$display("\r\n");
         end
     end
 

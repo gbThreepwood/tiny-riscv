@@ -6,7 +6,7 @@ module uart_tx #(
     input wire i_Rst_L,
     input wire i_Clk,
     input wire [7:0] i_TX_Byte,
-    input wire i_TX_Start,      // Initiate TX of the data in the TX register 
+    input wire i_TX_Start,      // Initiate TX of the data in the TX register
     output reg o_TX_InProgress,
     output reg o_TX_Done,
     output reg o_TX_Serial
@@ -20,8 +20,8 @@ localparam TX_STOP_BIT  = 3'b011;
 localparam FINISH       = 3'b100;
 
 reg [2:0] r_TX_State = IDLE;    // Register for the current state
-reg [2:0] r_Bit_Index;          // Bit index register
-reg [7:0] r_TX_Byte;            // TX data register
+reg [2:0] r_Bit_Index = 0;      // Bit index register
+reg [7:0] r_TX_Byte = 0;        // TX data register
 
 // 217 clocks per bit.
 // The function (e.g. in Python) floor(log2(217)) + 1 = 8 gives us the number of bits
@@ -37,7 +37,7 @@ reg [7:0] r_TX_Byte;            // TX data register
 reg [$clog2(CLKS_PER_BIT):0] r_Clock_Count;
 
 initial begin
-    o_TX_Serial = 1'b0;
+    o_TX_Serial = 1'b1;
     o_TX_Done = 1'b1;
     o_TX_InProgress = 1'b0;
 end
@@ -80,18 +80,18 @@ always @(posedge i_Clk or negedge i_Rst_L) begin
                     r_TX_State <= TX_DATA_BITS;
                 end
                 else begin
-                   r_Clock_Count <= r_Clock_Count + 1; 
+                   r_Clock_Count <= r_Clock_Count + 1;
                 end
-                
+
             end
         TX_DATA_BITS:
             begin
- 
+
                 o_TX_Serial <= r_TX_Byte[r_Bit_Index];
 
                 if(r_Clock_Count == (CLKS_PER_BIT - 1)) begin // Wait for one bit duration
                     r_Clock_Count <= 0;
-                    
+
                     if (r_Bit_Index < 7) begin
                         r_Bit_Index <= r_Bit_Index + 1;
                     end
@@ -101,13 +101,13 @@ always @(posedge i_Clk or negedge i_Rst_L) begin
                     end
                 end
                 else begin
-                   r_Clock_Count <= r_Clock_Count + 1; 
+                   r_Clock_Count <= r_Clock_Count + 1;
                 end
 
             end
         TX_STOP_BIT:
             begin
-                
+
                 o_TX_Serial <= 1'b1; // Set the serial line high to indicate a stop bit
 
                 if(r_Clock_Count == (CLKS_PER_BIT - 1)) begin // Wait for one bit duration
@@ -115,9 +115,9 @@ always @(posedge i_Clk or negedge i_Rst_L) begin
                     r_TX_State <= FINISH;
                 end
                 else begin
-                   r_Clock_Count <= r_Clock_Count + 1; 
+                   r_Clock_Count <= r_Clock_Count + 1;
                 end
-                               
+
             end
         FINISH:
             begin

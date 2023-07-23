@@ -16,21 +16,21 @@ module tiny_riscv_tb();
         .o_LED(w_LEDs),
         .i_Switch(r_Switch)
     );
-    
+
     initial begin
 
         r_Clk = 1'b0;
 
         r_ResetN <= 1'b0;
         #10 r_ResetN <= 1'b1;
-        #1500 $display("Explicitly calling finish from testbench.");
+        #550000 $display("Explicitly calling finish from testbench.");
         #1 $finish;
     end
 
 
     always
         #1 r_Clk = ~r_Clk;
-    
+
         //forever begin
         //    #1 r_Clk = ~r_Clk;
 
@@ -43,7 +43,7 @@ module tiny_riscv_tb();
 
     reg [4095:0] vcdfile;
 
-    initial 
+    initial
         begin
             if ($value$plusargs("vcd=%s", vcdfile)) begin
                 $dumpfile(vcdfile);
